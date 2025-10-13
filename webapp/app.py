@@ -2,14 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import csv
+import os
 from model.recommend import load_data, train_vectorizer, recommend_designs
 
 app = Flask(__name__)
 CORS(app)
 
+# CSV 경로 설정 (Render 환경 호환)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.path.join(BASE_DIR, "../2025년 금형제작리스트_통합.csv")
+
+# ----------------------------------------
 # 초기 데이터 로드
+# ----------------------------------------
 print("📂 CSV 데이터 로드 중...")
-df = load_data()
+df = pd.read_csv(CSV_PATH, encoding="utf-8")
 vectorizer, tfidf_matrix = train_vectorizer(df)
 print(f"✅ 데이터 로드 완료 ({len(df)}건)")
 
@@ -36,8 +43,8 @@ def upload_new_data():
     try:
         data = request.get_json()
 
-        # CSV에 새 행 추가
-        with open("2025년 금형제작리스트_통합.csv", "a", newline="", encoding="utf-8") as f:
+        # CSV 파일에 새 데이터 추가
+        with open(CSV_PATH, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow([
                 data.get("제번"), data.get("고객사"), data.get("설계"), data.get("제작처"),
@@ -46,9 +53,9 @@ def upload_new_data():
                 data.get("구조"), data.get("set_yn"), data.get("공정")
             ])
 
-        # 메모리 내 데이터 및 TF-IDF 갱신
+        # TF-IDF 벡터 갱신
         global df, vectorizer, tfidf_matrix
-        df = load_data()
+        df = pd.read_csv(CSV_PATH, encoding="utf-8")
         vectorizer, tfidf_matrix = train_vectorizer(df)
 
         return jsonify({"status": "success", "message": "CSV에 새 데이터 추가 및 벡터 갱신 완료"})
@@ -63,4 +70,4 @@ def home():
     return jsonify({"status": "running", "records": len(df)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
