@@ -18,7 +18,7 @@ CSV_PATH = os.path.join(BASE_DIR, "../2025년 금형제작리스트_통합.csv")
 # 초기 데이터 로드
 # ----------------------------------------
 print("📂 CSV 데이터 로드 중...")
-df = pd.read_csv(CSV_PATH, encoding="utf-8")
+df = load_data() 
 vectorizer, tfidf_matrix = train_vectorizer(df)
 print(f"✅ 데이터 로드 완료 ({len(df)}건)")
 
