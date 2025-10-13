@@ -3,5 +3,5 @@ services:
     name: mold-recommend-api
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python webapp/app.py"
+    startCommand: "python -m webapp.app"
     plan: free
