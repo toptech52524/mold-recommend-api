@@ -3,6 +3,8 @@ from flask_cors import CORS
 import pandas as pd
 import csv
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from model.recommend import load_data, train_vectorizer, recommend_designs
 
 app = Flask(__name__)
